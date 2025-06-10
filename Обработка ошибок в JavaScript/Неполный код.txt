@@ -1,0 +1,18 @@
+function fetchData(url) {
+ let data;
+ const xhr = new XMLHttpRequest();
+ 
+ xhr.open("GET", url, false);
+ xhr.send();
+ if (xhr.status === 200) {
+  data = JSON.parse(xhr.responseText);
+ } else {
+  console.log("Ошибка при получении данных");
+ }
+ 
+ return data;
+}
+
+// Использование функции
+const result = fetchData("https://api.example.com/data");
+console.log(result);

@@ -1,0 +1,49 @@
+class FetchDataError extends Error {
+constructor(message, status) {
+super(message);
+this.name = "FetchDataError";
+this.status = status;
+}
+}
+
+async function fetchData(url) {
+if (!url || typeof url !== 'string' || !url.startsWith('http')) {
+throw new FetchDataError('Неверный URL. Должен начинаться с http/https', 400);
+}
+
+try {
+const response = await fetch(url);
+
+if (!response.ok) {
+throw new FetchDataError(`HTTP ошибка! Статус: ${response.status}`, response.status);
+}
+
+try {
+const data = await response.json();
+return data;
+} catch (parseError) {
+throw new FetchDataError('Ошибка парсинга JSON данных', 500);
+}
+
+} catch (error) {
+if (error instanceof FetchDataError) {
+console.error(`${error.name}: ${error.message}`, `Статус: ${error.status}`);
+throw error;
+} else {
+console.error('Сетевая ошибка:', error.message);
+throw new FetchDataError('Произошла сетевая ошибка', 0);
+}
+}
+}
+(async () => {
+try {
+const result = await fetchData("https://api.example.com/data");
+console.log("Успешно получены данные:", result);
+} catch (error) {
+if (error instanceof FetchDataError) {
+console.error("Произошла ошибка при получении данных:", error.message);
+} else {
+console.error("Неизвестная ошибка:", error);
+}
+}
+})();
